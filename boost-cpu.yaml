@@ -1,0 +1,21 @@
+apiVersion: autoscaling.x-k8s.io/v1alpha1
+kind: StartupCPUBoost
+metadata:
+  name: boost-ace-burst-test
+  namespace: ace-demo
+selector:
+  matchExpressions:
+  - key: app.kubernetes.io/name
+    operator: In
+    values: ["ace-burst-test"]
+spec:
+  resourcePolicy:
+    containerPolicies:
+    - containerName: ace-container
+      fixedResources:
+        requests: "300m"
+        limits: "300m"
+  durationPolicy:
+    podCondition:
+      type: ContainersReady
+      status: "True"

@@ -1,0 +1,34 @@
+kind: Pod
+apiVersion: v1
+metadata:
+  name: ace-burst-test
+  namespace: ace-demo
+  labels:
+    app.kubernetes.io/name: ace-burst-test
+spec:
+  serviceAccountName: ace-burst-test-service-account
+  containers:
+    - name: ace-container
+      env:  
+        - name: LICENSE
+          value: 'accept'
+        - name: CPUFILE
+          value: '/sys/fs/cgroup/cpu.max'
+        - name: EXPECTEDCPU
+          value: '2000 100000'
+      imagePullPolicy: Always
+      image: 'tdolby/experimental:ace-burst-cpu'
+      resources:
+        limits:
+          cpu: 20m
+        requests:
+          cpu: 20m
+      readinessProbe:
+        tcpSocket:
+          port: 7600
+        timeoutSeconds: 3
+        periodSeconds: 2
+        successThreshold: 1
+        failureThreshold: 1
+  readinessGates:
+    - conditionType: "CPUChangeCondition"
